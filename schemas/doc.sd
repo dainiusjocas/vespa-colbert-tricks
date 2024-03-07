@@ -1,0 +1,68 @@
+# Copyright Yahoo. Licensed under the terms of the Apache 2.0 license. See LICENSE in the project root.
+
+# See https://docs.vespa.ai/en/schemas.html
+schema doc {
+
+    document doc {
+
+        field id type string {
+            indexing: summary 
+        }
+        field text type array<string> {
+            indexing: index | summary
+            index: enable-bm25
+        }
+        field colbert_doc_field type tensor<int8>(context{}, token{}, v[16]) {}
+    }
+    fieldset default {
+        fields: text
+    }
+
+    field colbert type tensor<int8>(context{}, token{}, v[16]) {
+        indexing {
+            0 | set_var chunk_cnt;
+            input text | for_each {
+                if (true == true) {
+                    get_var chunk_cnt + 1 | set_var chunk_cnt;
+                } else { "" }
+            };
+            if (get_var chunk_cnt < 3) {
+                input text | embed colbert context | attribute;
+            } else { "" };
+        }
+    }
+
+    field colbert2 type tensor<int8>(context{}, token{}, v[16]) {
+       indexing: ((input colbert_doc_field) || (input text | embed colbert context)) | attribute
+    }
+
+    rank-profile bm25 {
+        first-phase {
+            expression: bm25(text)
+        }
+    }
+
+    rank-profile colbert-max-sim-context-level inherits bm25 {
+        inputs {
+            query(qt) tensor<float>(querytoken{}, v[128])
+        }
+        
+        function max_sim_per_context() {
+            expression {
+                sum(
+                    reduce(
+                        sum(
+                            query(qt) * unpack_bits(attribute(colbert)) , v
+                        ),
+                        max, token
+                    ),
+                    querytoken
+                )
+            }
+        }
+        second-phase {
+            rerank-count: 400 
+            expression: reduce(max_sim_per_context, max, context)
+        }
+    }
+}

@@ -1,0 +1,5 @@
+<validation-overrides>
+    <allow until="2024-03-20">indexing-change</allow>
+    <allow until="2024-03-20">field-type-change</allow>
+    <allow until='2024-03-20'>paged-setting-removal</allow>
+</validation-overrides>
