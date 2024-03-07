@@ -12,7 +12,7 @@ Disclaimer: most of the code in this repo is shamelessly copied from the [Vespa 
 
 ## Setup
 
-Vespa(>8.3) running locally, `vespa-cli`, and `jq`.
+Vespa(>=8.314.57) running locally, `vespa-cli`, and `jq`.
 
 ## Limit the length of documents to be embedded
 
@@ -106,7 +106,7 @@ The trick is:
 1. Define a **document** field of the same type as the ColBERT **synthetic** field, e.g. `colbert2`.
 2. While visiting export also the colbert tensor.
 3. The main `colbert2` field makes an attribute either from the document field if provided
-or calculates the embeddings. 
+or calculates the embeddings.
 
 Simplified schema with all the other details removed:
 ```text
@@ -182,6 +182,9 @@ vespa visit --field-set 'doc:[document],colbert2'
 See that the `colbert2` field contains a tensor from our `doc1.jsonl` file.
 
 Voila!
+
+NOTE: the ColBERT tensors are compressed by the embedder.
+Uncompressed also works the same way. 
 
 ## Bonus
 
