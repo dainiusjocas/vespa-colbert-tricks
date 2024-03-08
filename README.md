@@ -99,6 +99,17 @@ embed only the first 10 chunks. Of course, a custom document processor could do 
 
 NOTE: the same trick works for other Vespa embedders.
 
+UPDATE: as of Vespa 8.307.19 the above trick fails when an empty list is provided, e.g.:
+```shell
+echo '{
+  "fields": {
+    "text": []
+  },
+  "put": "id:doc:doc::1"
+}' | vespa feed -
+```
+The progress on this bug is tracked [here](https://github.com/vespa-engine/vespa/issues/30512).
+
 ## Feed precomputed ColBERT tensors
 
 If you want to transfer a dataset that contains embeddings between Vespa deployments, e.g. from production to your local laptop.
