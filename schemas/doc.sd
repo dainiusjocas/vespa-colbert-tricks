@@ -33,7 +33,16 @@ schema doc {
     }
 
     field colbert2 type tensor<int8>(context{}, token{}, v[16]) {
-       indexing: ((input colbert_doc_field) || (input text | embed colbert context)) | attribute
+        indexing: ((input colbert_doc_field) || (input text | embed colbert context)) | attribute
+    }
+
+    field colbert3 type tensor<int8>(context{}, token{}, v[16]) {
+        indexing {
+            select_input {
+                colbert_doc_field: input colbert_doc_field | attribute;
+                text: input text | embed colbert context | attribute;
+            }
+        }
     }
 
     rank-profile bm25 {

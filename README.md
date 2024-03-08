@@ -186,6 +186,21 @@ Voila!
 NOTE: the ColBERT tensors are compressed by the embedder.
 Uncompressed also works the same way. 
 
+UPDATE: there is even a cleaner way to express the above idea: the [`select_input`]() statement, e.g.:
+
+```text
+field colbert3 type tensor<int8>(context{}, token{}, v[16]) {
+    indexing {
+        select_input {
+            colbert_doc_field: input colbert_doc_field | attribute;
+            text: input text | embed colbert context | attribute;
+        }
+    }
+}
+```
+
+One downside it has that only one indexing expression can be specified in each branch.
+
 ## Bonus
 
 The 2 tricks described above can be combined,
